@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Lojista — Ateliê Nuvem</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700&family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-corpo">
+
+  <!-- ==================== TELA DE LOGIN ==================== -->
+  <div class="admin-login" id="tela-login">
+    <div class="admin-login-caixa">
+      <h1>Área do lojista</h1>
+      <p>Digite a senha de administrador para gerenciar os produtos do catálogo.</p>
+      <div class="campo">
+        <label for="campo-senha">Senha</label>
+        <input type="password" id="campo-senha" placeholder="••••••••" autofocus>
+      </div>
+      <button class="botao botao-primario botao-bloco" id="botao-entrar">Entrar</button>
+      <p class="admin-erro" id="mensagem-erro-login"></p>
+      <p style="font-size:0.78rem;color:var(--cor-texto-suave);margin-top:1rem">
+       <!-- Senha padrão de demonstração: <code>admin123</code>. Veja no arquivo <code>admin.js</code> como trocá-la.-->
+      </p>
+    </div>
+  </div>
+
+  <!-- ==================== PAINEL (após login) ==================== -->
+  <div id="painel-admin" style="display:none">
+    <div class="admin-topbar">
+      <div class="marca">
+        <div class="marca-nome" style="font-size:1.1rem">Painel do lojista</div>
+      </div>
+      <div style="display:flex;gap:0.6rem;align-items:center">
+        <a href="index.html" target="_blank" class="botao botao-secundario" style="padding:0.5rem 1rem;font-size:0.8rem">Ver catálogo</a>
+        <button class="botao botao-secundario" id="botao-sair" style="padding:0.5rem 1rem;font-size:0.8rem">Sair</button>
+      </div>
+    </div>
+
+    <div class="admin-layout">
+      <!-- Menu lateral -->
+      <nav class="admin-menu">
+        <button data-secao="produtos" class="ativo">📦 Produtos</button>
+        <button data-secao="novo">➕ Adicionar produto</button>
+        <button data-secao="categorias">🏷️ Categorias</button>
+        <button data-secao="loja">🏬 Dados da loja</button>
+        <button data-secao="salvar">💾 Salvar / Exportar</button>
+      </nav>
+
+      <div class="admin-conteudo">
+
+        <!-- Aviso geral -->
+        <div class="admin-alerta">
+          As alterações ficam salvas automaticamente neste navegador enquanto você trabalha.
+          Para que os clientes vejam as mudanças, use a seção <strong>Salvar / Exportar</strong> para
+          atualizar o arquivo <code>produtos.json</code> do site.
+        </div>
+
+        <!-- SEÇÃO: LISTA DE PRODUTOS -->
+        <section class="secao-admin" id="secao-produtos">
+          <div class="admin-cartao">
+            <h3 style="margin-bottom:1rem">Produtos cadastrados</h3>
+            <div class="campo" style="max-width:320px">
+              <input type="text" id="busca-admin" placeholder="Buscar produto por nome ou código...">
+            </div>
+            <div style="overflow-x:auto">
+              <table class="tabela-produtos">
+                <thead>
+                  <tr>
+                    <th>Foto</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Status</th><th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="corpo-tabela-produtos"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO: ADICIONAR / EDITAR PRODUTO -->
+        <section class="secao-admin" id="secao-novo" style="display:none">
+          <div class="admin-cartao">
+            <h3 style="margin-bottom:1rem" id="titulo-form-produto">Adicionar produto</h3>
+            <form id="form-produto">
+              <input type="hidden" id="produto-codigo-original">
+              <div class="form-grade">
+                <div class="campo">
+                  <label for="produto-nome">Nome do produto *</label>
+                  <input type="text" id="produto-nome" required>
+                </div>
+                <div class="campo">
+                  <label for="produto-codigo">Código do produto *</label>
+                  <input type="text" id="produto-codigo" required placeholder="Ex: CAM001">
+                </div>
+                <div class="campo">
+                  <label for="produto-categoria">Categoria *</label>
+                  <select id="produto-categoria" required></select>
+                </div>
+                <div class="campo">
+                  <label for="produto-status">Status *</label>
+                  <select id="produto-status" required>
+                    <option value="Disponível">Disponível</option>
+                    <option value="Esgotado">Esgotado</option>
+                  </select>
+                </div>
+                <div class="campo">
+                  <label for="produto-preco">Preço (R$) *</label>
+                  <input type="number" id="produto-preco" min="0" step="0.01" required>
+                </div>
+                <div class="campo">
+                  <label for="produto-preco-promo">Preço promocional (R$)</label>
+                  <input type="number" id="produto-preco-promo" min="0" step="0.01" placeholder="Deixe em branco se não houver">
+                </div>
+                <div class="campo">
+                  <label for="produto-tamanhos">Tamanhos * (separados por vírgula)</label>
+                  <input type="text" id="produto-tamanhos" required placeholder="P, M, G, GG">
+                </div>
+                <div class="campo">
+                  <label for="produto-cores">Cores * (separadas por vírgula)</label>
+                  <input type="text" id="produto-cores" required placeholder="Preto, Branco">
+                </div>
+                <div class="campo campo-largo">
+                  <label for="produto-descricao">Descrição *</label>
+                  <textarea id="produto-descricao" rows="3" required></textarea>
+                </div>
+                <div class="campo campo-largo">
+                  <label>Etiquetas</label>
+                  <div class="grupo-cores" id="etiquetas-opcoes">
+                    <button type="button" class="chip" data-et="Novo">Novo</button>
+                    <button type="button" class="chip" data-et="Promoção">Promoção</button>
+                    <button type="button" class="chip" data-et="Mais vendido">Mais vendido</button>
+                  </div>
+                </div>
+                <div class="campo">
+                  <label style="display:flex;align-items:center;gap:0.5rem">
+                    <input type="checkbox" id="produto-destaque" style="width:auto">
+                    Exibir na seção "Produtos em destaque"
+                  </label>
+                </div>
+                <div class="campo campo-largo">
+                  <label>Fotos do produto</label>
+                  <div class="upload-area" id="area-upload">
+                    📷 Clique aqui ou arraste imagens para enviar<br>
+                    <small>As imagens ficam salvas dentro do próprio produtos.json (não precisa mexer na pasta fotos)</small>
+                  </div>
+                  <input type="file" id="input-upload" accept="image/*" multiple style="display:none">
+                  <div class="pre-visualizacao-imagens" id="pre-visualizacao"></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.6rem;margin-top:1.2rem">
+                <button type="submit" class="botao botao-primario">Salvar produto</button>
+                <button type="button" class="botao botao-secundario" id="botao-cancelar-form">Cancelar</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- SEÇÃO: CATEGORIAS -->
+        <section class="secao-admin" id="secao-categorias" style="display:none">
+          <div class="admin-cartao">
+            <h3 style="margin-bottom:1rem">Categorias da loja</h3>
+            <div class="campo" style="display:flex;gap:0.5rem;max-width:400px">
+              <input type="text" id="nova-categoria" placeholder="Nome da nova categoria">
+              <button class="botao botao-primario" id="botao-add-categoria" style="white-space:nowrap">Adicionar</button>
+            </div>
+            <div class="grupo-cores" id="lista-categorias" style="margin-top:1rem"></div>
+          </div>
+        </section>
+
+        <!-- SEÇÃO: DADOS DA LOJA -->
+        <section class="secao-admin" id="secao-loja" style="display:none">
+          <div class="admin-cartao">
+            <h3 style="margin-bottom:1rem">Dados da loja</h3>
+            <div class="form-grade">
+              <div class="campo"><label>Nome da loja</label><input type="text" id="loja-nome"></div>
+              <div class="campo"><label>Slogan</label><input type="text" id="loja-slogan"></div>
+              <div class="campo"><label>WhatsApp (só números, com DDI e DDD)</label><input type="text" id="loja-whatsapp" placeholder="5511999999999"></div>
+              <div class="campo"><label>E-mail de contato</label><input type="text" id="loja-email"></div>
+              <div class="campo campo-largo"><label>Endereço</label><input type="text" id="loja-endereco"></div>
+              <div class="campo"><label>Instagram (link completo)</label><input type="text" id="loja-instagram"></div>
+              <div class="campo"><label>Facebook (link completo)</label><input type="text" id="loja-facebook"></div>
+              <div class="campo campo-largo">
+                <label>Logo (arquivo em fotos/logo.png, ou envie um novo abaixo)</label>
+                <input type="file" id="loja-logo-upload" accept="image/*">
+              </div>
+              <div class="campo campo-largo">
+                <label>Banner principal (arquivo em fotos/banner.jpg, ou envie um novo abaixo)</label>
+                <input type="file" id="loja-banner-upload" accept="image/*">
+              </div>
+            </div>
+            <button class="botao botao-primario" id="botao-salvar-loja" style="margin-top:1rem">Salvar dados da loja</button>
+          </div>
+        </section>
+
+        <!-- SEÇÃO: SALVAR / EXPORTAR -->
+        <section class="secao-admin" id="secao-salvar" style="display:none">
+          <div class="admin-cartao">
+            <h3 style="margin-bottom:0.6rem">Publicar alterações no site</h3>
+            <p style="color:var(--cor-texto-suave);font-size:0.9rem;margin-bottom:1rem">
+              Por segurança, o navegador não pode alterar arquivos do computador sozinho.
+              Escolha uma das opções abaixo para publicar as alterações:
+            </p>
+
+            <div class="admin-cartao" style="background:var(--cor-fundo-alt);margin-bottom:1rem">
+              <h4 style="margin-bottom:0.4rem">Opção 1 — Salvar direto no arquivo (recomendado)</h4>
+              <p style="font-size:0.85rem;color:var(--cor-texto-suave);margin-bottom:0.8rem">
+                Disponível em navegadores como Chrome ou Edge no computador. Escolha o arquivo
+                <code>produtos.json</code> da pasta do site uma vez, e o painel grava as próximas
+                alterações direto nele.
+              </p>
+              <button class="botao botao-primario" id="botao-salvar-direto">Selecionar e salvar produtos.json</button>
+              <span id="status-salvar-direto" style="font-size:0.82rem;margin-left:0.6rem;color:var(--cor-texto-suave)"></span>
+            </div>
+
+            <div class="admin-cartao" style="background:var(--cor-fundo-alt)">
+              <h4 style="margin-bottom:0.4rem">Opção 2 — Baixar o arquivo atualizado</h4>
+              <p style="font-size:0.85rem;color:var(--cor-texto-suave);margin-bottom:0.8rem">
+                Funciona em qualquer navegador. Baixe o novo <code>produtos.json</code> e substitua
+                o arquivo antigo na pasta do site (por exemplo, enviando-o de novo para a hospedagem).
+              </p>
+              <button class="botao botao-secundario" id="botao-baixar-json">Baixar produtos.json</button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
